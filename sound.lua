@@ -9,6 +9,7 @@ audio_params = {
 	dac_ctrl = 20
 }
 TOOT_FILE = "/luadb/toot.amr"
+BEEP_FILE = "/luadb/beep.amr"
 
 playing = false
 recording = false
@@ -125,7 +126,7 @@ end
 
 function hangup(args)
 	if calling == 0 then return end
-	cc.hangup(0)
+	cc.hangUp(0)
 end
 
 function hangup_toot(args)
@@ -145,7 +146,7 @@ function sound_task()
 		local args = message[3]
 		log.info("sound", cmd, args)
 		if COMMANDS[cmd] == nil then
-			log.error("sound", "unknown command")
+			log.error("sound", "unknown command", cmd)
 		else
 			local code = COMMANDS[cmd](args)
 			log.info("sound", cmd, "finished", code)
@@ -158,6 +159,14 @@ COMMANDS = {
 	record_voice = record_voice,
 	play_stop_wait = play_stop_wait,
 	record_stop_wait = record_stop_wait,
+	dial = dial,
+	toot = toot,
+	stop_toot = stop_toot,
+	beep = beep,
+	accept_call = accept_call,
+	hangup = hangup,
+	hangup_toot = hangup_toot,
+	call_failed_beep = call_failed_beep,
 }
 
 return {
