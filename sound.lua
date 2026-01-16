@@ -1,5 +1,7 @@
 -- process all interactions with the mic and speaker
 
+exaudio = require("exaudio")
+
 audio_params = {
 	model = "es8311",
 	i2c_id = 0,
@@ -29,6 +31,7 @@ function record_voice(args)
 	if calling ~= 0 then return false end
 
 	recording = true
+	exaudio.mic_vol(100)
 	exaudio.record_start({
 		format = exaudio.AMR_NB,
 		time = 60,

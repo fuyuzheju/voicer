@@ -5,13 +5,13 @@ function on_button()
         -- down
         local total_time = 0
         local flag = false
-        while total_time < 400 then
+        while total_time < 400 do
             sys.wait(100)
             if gpio.get(button_gpio) == 1 then
                 flag = true
                 break
             end
-            total_time += 100
+            total_time = total_time + 100
         end
         
         if flag then
@@ -42,3 +42,7 @@ function voice_task()
         on_button()
     end
 end
+
+return {
+    voice_task = voice_task
+}
