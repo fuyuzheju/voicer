@@ -8,10 +8,16 @@ audio_params = {
 	pa_ctrl = gpio.AUDIOPA_EN,
 	dac_ctrl = 20
 }
+TOOT_FILE = "/luadb/toot.amr"
 
 playing = false
 recording = false
 calling = 0
+-- 0: no call
+-- 1: on call
+-- 2: dialing
+-- 3: incoming
+toot_timer = nil
 
 function play_voice(args)
 	if recording then return false end
@@ -42,24 +48,94 @@ function record_voice(args)
 end
 
 function play_stop_wait(args)
+	if calling ~= 0 then return false end
 	if playing then
 		exaudio.play_stop()
-	end
-	while playing do
-		sys.wait(50)
+		while playing do
+			sys.wait(50)
+		end
 	end
 	return true
 end
 
 function record_stop_wait(args)
+	if calling ~= 0 then return false end
 	if recording then
 		exaudio.record_stop()
-	end
-	while recording do
-		sys.wait(50)
+		while recording do
+			sys.wait(50)
+		end
 	end
 	return true
 end
+
+
+function dial(args)
+	if calling ~= 0 then return end
+	record_stop_wait()
+	play_stop_wait()
+
+	cc.dial(0, args.number)
+	toot_timer = sys.timerLoopStart(function()
+		sys.sendMsg("sound_task", "execute", "toot")
+	end, 5000)
+end
+
+function toot(args)
+	if calling ~= 2 then return end
+	record_stop_wait()
+	play_stop_wait()
+
+	playing = true
+	exaudio.play_start({
+		type = 0,
+		content = TOOT_FILE,
+		cbfnc = function() playing = false end,
+	})
+end
+
+function stop_toot(args)
+	if toot_timer then
+		sys.timerStop(toot_timer)
+		toot_timer = nil
+	end
+	play_stop_wait()
+end
+
+function beep(args)
+	if calling ~= 3 then return end
+	record_stop_wait()
+	play_stop_wait()
+
+	playing = true
+	exaudio.play_start({
+		type = 0,
+		content = BEEP_FILE,
+		cbfnc = function() playing = false end,
+	})
+end
+
+function accept_call(args)
+	if calling ~= 3 then return end
+	record_stop_wait()
+	play_stop_wait()
+
+	cc.accept(0)
+end
+
+function hangup(args)
+	if calling == 0 then return end
+	cc.hangup(0)
+end
+
+function hangup_toot(args)
+	log.info("sound", "hangup_toot")
+end
+
+function call_failed_beep(args)
+	log.info("sound", "call_failed_beep")
+end
+
 
 function sound_task()
 	exaudio.setup(audio_params)
