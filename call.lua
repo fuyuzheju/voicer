@@ -19,7 +19,7 @@ function cc_callback(event)
         calling = 1
         sys.sendMsg("sound_task", "execute", "stop_toot")
     
-    elseif event == "DISCONNECTED" or event == "HANGUP_CALL_DOEN" then
+    elseif event == "DISCONNECTED" or event == "HANGUP_CALL_DONE" then
         calling = 0
         sys.sendMsg("sound_task", "execute", "stop_toot")
         sys.sendMsg("sound_task", "execute", "hangup_toot")
