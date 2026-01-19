@@ -1,6 +1,15 @@
 PROJECT = "demo"
 VERSION = "1.0.0"
 
+-- constants
+SERVER_CERT = io.readFile("/luadb/ca.crt")
+CLIENT_CERT = io.readFile("/luadb/voicer.crt")
+CLIENT_KEY = io.readFile("/luadb/voicer.key")
+RECORD_FILE = "/udata/record.amr"
+RECORD_TIME = 60
+TOOT_FILE = "/luadb/toot.amr"
+BEEP_FILE = "/luadb/beep.amr"
+
 sys = require("sys")
 
 if wdt then

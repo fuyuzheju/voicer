@@ -8,8 +8,6 @@ audio_params = {
 	pa_ctrl = gpio.AUDIOPA_EN,
 	dac_ctrl = 20
 }
-TOOT_FILE = "/luadb/toot.amr"
-BEEP_FILE = "/luadb/beep.amr"
 
 playing = false
 recording = false
@@ -41,7 +39,7 @@ function record_voice(args)
 	exaudio.mic_vol(100)
 	exaudio.record_start({
 		format = exaudio.AMR_NB,
-		time = 60,
+		time = RECORD_TIME,
 		path = args.filename,
 		cbfnc = function() recording = false end,
 	})
@@ -149,6 +147,7 @@ function sound_task()
 			log.error("sound", "unknown command", cmd)
 		else
 			local code = COMMANDS[cmd](args)
+			sys.publish("sound_finish")
 			log.info("sound", cmd, "finished", code)
 		end
 	end
